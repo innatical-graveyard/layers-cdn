@@ -1,0 +1,29 @@
+{
+  "name": "layers-gateway",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "nodemon src/index.ts"
+  },
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "fastify": "^3.21.5",
+    "fastify-multipart": "^5.0.0",
+    "jsonwebtoken": "^8.5.1",
+    "minio": "^7.0.19",
+    "nanoid": "^3.1.25",
+    "sharp": "^0.29.1"
+  },
+  "devDependencies": {
+    "@types/busboy": "^0.2.4",
+    "@types/jsonwebtoken": "^8.5.5",
+    "@types/minio": "^7.0.10",
+    "@types/node": "^16.9.6",
+    "@types/sharp": "^0.29.2",
+    "nodemon": "^2.0.12",
+    "prisma": "^3.1.1",
+    "ts-node": "^10.2.1",
+    "typescript": "^4.4.3"
+  }
+}
