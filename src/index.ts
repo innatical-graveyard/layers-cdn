@@ -141,7 +141,7 @@ fastify.post("/upload/avatar", async (req, reply) => {
   });
 });
 
-fastify.listen(3001, (err) => {
+fastify.listen(3000, "0.0.0.0", (err) => {
   if (err) {
     fastify.log.error(err);
     process.exit(1);
