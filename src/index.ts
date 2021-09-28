@@ -6,6 +6,7 @@ import { nanoid } from "nanoid";
 import jsonwebtoken from "jsonwebtoken";
 import sharp from "sharp";
 import stream from "stream";
+import cors from "fastify-cors";
 
 const fastify = Fastify();
 
@@ -19,6 +20,10 @@ fastify.register(FastifyMultipart, {
   limits: {
     fileSize: 12 * 10 ** 6,
   },
+});
+
+fastify.register(cors, {
+  origin: true,
 });
 
 const imageMimetypes = [

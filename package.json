@@ -10,6 +10,7 @@
   "dependencies": {
     "dotenv": "^10.0.0",
     "fastify": "^3.21.5",
+    "fastify-cors": "^6.0.2",
     "fastify-multipart": "^5.0.0",
     "jsonwebtoken": "^8.5.1",
     "minio": "^7.0.19",
