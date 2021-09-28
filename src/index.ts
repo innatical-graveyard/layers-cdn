@@ -5,13 +5,12 @@ import { Client } from "minio";
 import { nanoid } from "nanoid";
 import jsonwebtoken from "jsonwebtoken";
 import sharp from "sharp";
+import stream from "stream";
 
-const fastify = Fastify({
-  logger: true,
-});
+const fastify = Fastify();
 
 const minioClient = new Client({
-  endPoint: "fra1.digitaloceanspaces.com",
+  endPoint: process.env.ENDPOINT!,
   accessKey: process.env.ACCESS_KEY!,
   secretKey: process.env.SECRET_KEY!,
 });
@@ -32,7 +31,12 @@ const imageMimetypes = [
 ];
 
 fastify.post("/upload/file", async (req, reply) => {
-  if (!req.headers.authorization) return;
+  if (!req.headers.authorization)
+    return reply.status(403).send({
+      ok: false,
+      error: "TokenNotProvided",
+    });
+
   let token: {
     type: string;
     sub: string;
@@ -79,7 +83,12 @@ fastify.post("/upload/file", async (req, reply) => {
 });
 
 fastify.post("/upload/avatar", async (req, reply) => {
-  if (!req.headers.authorization) return;
+  if (!req.headers.authorization)
+    return reply.status(403).send({
+      ok: false,
+      error: "TokenNotProvided",
+    });
+
   let token: {
     type: string;
     sub: string;
@@ -116,19 +125,15 @@ fastify.post("/upload/avatar", async (req, reply) => {
 
   const id = nanoid();
 
-  await minioClient.putObject(
-    "layers",
-    id,
-    // TODO: This is prob a terrible way to do this, but I can't figure out FUCKING node streams
-    await sharp(await file.toBuffer())
-      .resize({ width: 250, height: 250 })
-      .toBuffer(),
-    {
-      "Content-Type": file.mimetype,
-      "x-amz-acl": "public-read",
-      userid: token.sub,
-    }
-  );
+  const passthrough = new stream.PassThrough();
+  const sizeTransform = sharp().resize(500, 500).webp();
+  file.file.pipe(sizeTransform).pipe(passthrough);
+
+  await minioClient.putObject("layers", id, passthrough, {
+    "Content-Type": file.mimetype,
+    "x-amz-acl": "public-read",
+    userid: token.sub,
+  });
 
   reply.send({
     ok: true,
@@ -136,7 +141,7 @@ fastify.post("/upload/avatar", async (req, reply) => {
   });
 });
 
-fastify.listen(3000, (err) => {
+fastify.listen(3001, (err) => {
   if (err) {
     fastify.log.error(err);
     process.exit(1);
